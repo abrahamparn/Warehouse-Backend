@@ -7,9 +7,10 @@ const logger = require("./middleware/logger");
 const config = require("./utils/config");
 const { morganLogger, requestLogger, unknownEndpoint } = require("./middleware/middleware");
 const errorHandler = require("./middleware/errorHandler");
-// const authorize = require("./middleware/authorization");
+const authorize = require("./middleware/authorization");
 
 const testRouter = require("./modules/test/test.router"); // If implemented
+const authRouter = require("./modules/authentication/authentication.router");
 
 const app = express();
 
@@ -25,6 +26,9 @@ if (process.env.NODE_ENV !== "test") {
   app.use(morganLogger);
   app.use(requestLogger);
 }
+
+// Public Routes
+app.use("/api/authentication", authRouter);
 
 if (process.env.NODE_ENV === "test") {
   app.use("/api/test", testRouter);
