@@ -106,4 +106,51 @@ PRODUCTION_POSTGRES_URI={CHANGE INTO YOUR OWN URI}
 </code>
 </pre>
 
+## Database installation
+
+1. there are a lot of table that you need to create
+
+```sql
+-- Step 1: Create database (PostgreSQL)
+CREATE DATABASE warehouse_management_system;
+
+
+-- Step 2: Connect to the database (done outside SQL script)
+-- \c warehouse_management_system
+
+-- Step 3: Create the users table
+CREATE TABLE IF NOT EXISTS users (
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password TEXT NOT NULL, -- bcrypt hash recommended
+    role VARCHAR(50) DEFAULT 'user' NOT NULL,
+    is_verified BOOLEAN DEFAULT FALSE,
+    last_login TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- step 4: create a function that automatically update the last updated_at
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+   NEW.updated_at = NOW();
+   RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_users_updated_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+-- step 4.5: to check what functions are running in your database
+SELECT proname
+FROM pg_proc
+JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
+WHERE ns.nspname NOT IN ('pg_catalog', 'information_schema')
+ORDER BY proname;
+```
+
 ---

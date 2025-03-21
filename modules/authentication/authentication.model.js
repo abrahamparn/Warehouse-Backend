@@ -13,7 +13,6 @@ const checkEmail = async (email) => {
     `SELECT EXISTS (SELECT 1 FROM users WHERE email = $1) AS "exists"`,
     [email]
   );
-  console.log(result);
   return result.rows[0].exists;
 };
 
@@ -32,11 +31,11 @@ const deleteOneUser = async (username) => {
   return result.rowCount > 0; // Returns true if at least one row was deleted
 };
 
-const selectOneUser = async (username) => {
+const selectOneUser = async (email) => {
   const result = await db.query(
     `SELECT user_id, email, username, password, role, is_verified, last_login, created_at, updated_at 
-       FROM users WHERE username = $1`,
-    [username]
+       FROM users WHERE email = $1`,
+    [email]
   );
   return result.rows[0];
 };

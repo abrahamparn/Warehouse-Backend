@@ -34,6 +34,32 @@ const register = async (req, res, next) => {
   }
 };
 
+const login = async (req, res, next) => {
+  try {
+    const { email = "", password = "" } = req.body;
+    if (!email.trim() || !password.trim()) {
+      return res.status(400).json({ error: "email and password are required" });
+    }
+    const emailExists = await userModel.checkEmail(email);
+    if (!emailExists) {
+      return res.status(400).json({ error: "Email does not exists" });
+    }
+    const user = await userModel.selectOneUser(email);
+
+    const passwordValid = await comparePassword(password, user.password);
+    if (!passwordValid) {
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    let token = createToken(user);
+    return res.status(200).json({ token: token, username: user.username, role: user.role });
+  } catch (exception) {
+    error(exception);
+    next(exception);
+  }
+};
+
 module.exports = {
   register,
+  login,
 };

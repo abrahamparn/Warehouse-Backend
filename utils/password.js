@@ -14,9 +14,13 @@ const comparePassword = async (password, hashedPassword) => {
 };
 
 const createToken = (user) => {
-  let token = jwt.sign({ username: user.username, id: user.id }, process.env.SECRET, {
-    expiresIn: "1h",
-  });
+  let token = jwt.sign(
+    { username: user.username, id: user.user_id, role: user.role },
+    process.env.SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
 
   return token;
 };

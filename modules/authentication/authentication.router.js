@@ -1,7 +1,7 @@
 const express = require("express");
 const authenticationController = require("./authentication.controller");
 const authorize = require("../../middleware/authorization");
-const { validateRegistration } = require("../../middleware/validation");
+const { validateRegistration, validateLogin } = require("../../middleware/validation");
 const { authLimiter } = require("../../middleware/authLimiter");
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const router = express.Router();
 router.post("/register", validateRegistration, authenticationController.register);
 
 // Route: POST /api/authentication/login
-// router.post("/login", authLimiter, authenticationController.login);
+router.post("/login", authLimiter, validateLogin, authenticationController.login);
 
 // Route: POST /api/authentication/change-password
 // router.post("/change-password", authorize, authenticationController.changePassword);
