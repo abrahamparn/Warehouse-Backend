@@ -131,6 +131,69 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- =======================
+-- 1. Tabel Warehouse
+--    (agar FK di StockBarang valid)
+-- =======================
+CREATE TABLE IF NOT EXISTS WAREHOUSE (
+    warehouse_id     SERIAL          PRIMARY KEY,
+    nama_warehouse   VARCHAR(50)     NOT NULL,
+    lokasi_warehouse VARCHAR(255)
+);
+
+
+-- =======================
+-- 2. Tabel JenisBarang
+--    (master jenis/kategori barang)
+-- =======================
+CREATE TABLE IF NOT EXISTS JenisBarang (
+    jenis_id   SERIAL        PRIMARY KEY,
+    deskripsi  VARCHAR(255)  NOT NULL
+);
+
+
+CREATE TABLE IF NOT EXISTS BARANG (
+    barang_id       SERIAL         PRIMARY KEY,
+    kode_barang     VARCHAR(50)    NOT NULL UNIQUE,
+    nama_barang     VARCHAR(255)   NOT NULL,
+
+    jenis_id        INT            NOT NULL,
+    CONSTRAINT fk_jenis_id
+        FOREIGN KEY (jenis_id) REFERENCES JenisBarang(jenis_id),
+
+    harga_terkini   numeric(12,2),
+
+    -- Misalnya kita ingin simpan satuan berat/volume dalam bentuk teks
+    satuan_berat    VARCHAR(50),
+    berat           numeric(12,4)  DEFAULT 0,   -- Contoh: dalam kg (jika padat)
+    satuan_volume   VARCHAR(50),
+    volume          numeric(12,4)  DEFAULT 0,   -- Contoh: dalam liter / m3
+
+    created_at      TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP      DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+-- =======================
+-- 4. Tabel StockBarang
+--    (menyimpan stok barang per warehouse)
+-- =======================
+CREATE TABLE IF NOT EXISTS StockBarang (
+    stock_id     SERIAL       PRIMARY KEY,
+    barang_id    INT          NOT NULL,
+    warehouse_id INT          NOT NULL,
+    quantity     INT          NOT NULL DEFAULT 0,
+
+    updated_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_by   INT,         -- opsional, user_id
+
+    CONSTRAINT fk_barang_id FOREIGN KEY (barang_id)
+      REFERENCES barang(barang_id) ON DELETE CASCADE,
+    CONSTRAINT fk_warehouse_id
+        FOREIGN KEY (warehouse_id) REFERENCES WAREHOUSE(warehouse_id)
+);
+
 -- step 4: create a function that automatically update the last updated_at
 CREATE OR REPLACE FUNCTION update_modified_column()
 RETURNS TRIGGER AS $$
@@ -145,12 +208,80 @@ BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
 
+CREATE TRIGGER update_StockBarang_updated_at
+BEFORE UPDATE ON StockBarang
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+CREATE TRIGGER update_BARANG_updated_at
+BEFORE UPDATE ON BARANG
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
 -- step 4.5: to check what functions are running in your database
 SELECT proname
 FROM pg_proc
 JOIN pg_namespace ns ON (pg_proc.pronamespace = ns.oid)
 WHERE ns.nspname NOT IN ('pg_catalog', 'information_schema')
 ORDER BY proname;
+
+-- if you want to check all trigger
+SELECT
+    event_object_table AS table_name,
+    trigger_name,
+    event_manipulation AS event,
+    action_timing AS timing,
+    action_statement AS function_call
+FROM
+    information_schema.triggers
+ORDER BY
+    event_object_table, trigger_name;
+
+
+-- step 5: insert initial data (you can change the data up to your liking)
+INSERT INTO WAREHOUSE (nama_warehouse, lokasi_warehouse)
+VALUES
+    ('Warehouse Jakarta', 'Cakung - Jakarta Timur'),
+    ('Warehouse Surabaya', 'Rungkut - Surabaya'),
+    ('Warehouse Medan', 'Tanjung Morawa - Medan');
+
+
+INSERT INTO JenisBarang (deskripsi)
+VALUES
+    ('Makanan'),
+    ('Minuman'),
+    ('Kebutuhan Rumah Tangga'),
+    ('Produk Kebersihan');
+
+
+INSERT INTO BARANG
+(kode_barang, nama_barang, jenis_id, harga_terkini, satuan_berat, berat, satuan_volume, volume)
+VALUES
+    -- 1) Indomie (jenis_id=1 -> Makanan)
+    ('IND-001', 'Indomie Goreng', 1, 2500, 'gr', 85, 'ml', 0),
+
+    -- 2) Beras 5kg (jenis_id=1 -> Makanan)
+    ('BRS-005', 'Beras Premium 5kg', 1, 75000, 'kg', 5, '', 0),
+
+    -- 3) Aqua Gelas 24pcs (jenis_id=2 -> Minuman)
+    ('AQG-024', 'Aqua Gelas (24 pcs)', 2, 20000, 'ml', 190, 'ml', 0),
+
+    -- 4) Coca-Cola 1.5L (jenis_id=2 -> Minuman)
+    ('CCL-15L', 'Coca-Cola 1.5 Liter', 2, 12500, 'kg', 1.5, 'L', 1.5),
+
+    -- 5) Tisu Gulung (jenis_id=3 -> Kebutuhan Rumah Tangga)
+    ('TSG-001', 'Tisu Gulung (6 roll)', 3, 18000, '', 0, '', 0),
+
+    -- 6) Sampo Botol 200ml (jenis_id=4 -> Produk Kebersihan)
+    ('SMP-200', 'Sampo Anti Ketombe 200ml', 4, 15000, 'ml', 200, 'ml', 200),
+
+    -- 7) Sabun Mandi Batang (jenis_id=4 -> Produk Kebersihan)
+    ('SBN-001', 'Sabun Mandi Batang', 4, 3000, 'gr', 80, 'ml', 0);
+
+
+
+
+select stockbarang.barang, users.username from stockbarang join users on stockbarang.updated_by = users.user_id
 ```
 
 ---

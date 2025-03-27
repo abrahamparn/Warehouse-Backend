@@ -11,6 +11,7 @@ const authorize = require("./middleware/authorization");
 
 const testRouter = require("./modules/test/test.router"); // If implemented
 const authRouter = require("./modules/authentication/authentication.router");
+const dataBarangRouter = require("./modules/dataBarang/dataBarang.router");
 
 const app = express();
 
@@ -34,6 +35,8 @@ if (process.env.NODE_ENV === "test") {
   app.use("/api/test", testRouter);
 }
 
+//! implement authorize
+app.use("/api/dataBarang", dataBarangRouter);
 // Handle Unknown Endpoints
 app.use(unknownEndpoint);
 
