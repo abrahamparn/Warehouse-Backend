@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === "test") {
 }
 
 //! implement authorize
-app.use("/api/dataBarang", dataBarangRouter);
+app.use("/api/dataBarang", authorize, dataBarangRouter);
 // Handle Unknown Endpoints
 app.use(unknownEndpoint);
 

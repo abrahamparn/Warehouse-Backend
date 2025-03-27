@@ -2,8 +2,7 @@ const express = require("express");
 const dataBarangController = require("./dataBarang.controller");
 
 //! implement later for roles admin, user, operator
-const authorize = require("../../middleware/authorization");
-//! implement later
+const { checkRole } = require("../../middleware/checkRole");
 const { validateGetBarangById, validateAddBarang } = require("../../middleware/validation");
 
 const router = express.Router();
@@ -16,12 +15,22 @@ router.get("/", dataBarangController.getAllBarang);
 router.get("/:id", validateGetBarangById, dataBarangController.getAllBarangById);
 
 // Route : POST /api/dataBarang/
-router.post("/", validateAddBarang, dataBarangController.addBarang);
+router.post("/", checkRole("admin"), validateAddBarang, dataBarangController.addBarang);
 
 // Route: PUT /api/dataBarang/
-router.put("/:id", validateGetBarangById, dataBarangController.updateBarangById);
+router.put(
+  "/:id",
+  checkRole("admin"),
+  validateGetBarangById,
+  dataBarangController.updateBarangById
+);
 
 // Route: DELETE /api/dataBarang/:id
-router.delete("/:id", validateGetBarangById, dataBarangController.deleteBarangById);
+router.delete(
+  "/:id",
+  checkRole("admin"),
+  validateGetBarangById,
+  dataBarangController.deleteBarangById
+);
 
 module.exports = router;
