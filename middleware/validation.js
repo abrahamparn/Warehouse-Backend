@@ -27,7 +27,7 @@ const validateLogin = [
 
 const validateGetBarangById = [
   param("id")
-    .exists()
+    .notEmpty()
     .withMessage("Todo ID is required")
     .bail()
     .isInt({ gt: 0 })
@@ -43,10 +43,10 @@ const validateGetBarangById = [
 ];
 
 const validateAddBarang = [
-  body("kodeBarang").exists().withMessage("Kode barang harus diisi"),
-  body("namaBarang").exists().withMessage("Nama barang harus diisi"),
+  body("kodeBarang").notEmpty().withMessage("Kode barang harus diisi"),
+  body("namaBarang").notEmpty().withMessage("Nama barang harus diisi"),
   body("jenisBarang")
-    .exists()
+    .notEmpty()
     .withMessage("ID Jenis Barang harus diisi")
     .isInt()
     .withMessage("ID Jenis barang hanya bisa angka"),
@@ -71,9 +71,24 @@ const validateAddBarang = [
   },
 ];
 
+const validateAddJenisBarang = [
+  body("deskripsi")
+    .trim() // Optional: trims whitespace
+    .notEmpty()
+    .withMessage("Deskripsi harus diisi"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
   validateGetBarangById,
   validateAddBarang,
+  validateAddJenisBarang,
 };

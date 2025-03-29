@@ -3,7 +3,7 @@ const db = require("../../utils/db");
 const getAllBarang = async () => {
   const result = await db.query(
     `SELECT BARANG.barang_id, BARANG.kode_barang, BARANG.nama_barang, 
-    jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, 
+    jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, BARANG.satuan_berat,
     BARANG.berat, BARANG.satuan_volume, BARANG.volume 
     FROM BARANG JOIN jenisbarang ON BARANG.jenis_id = jenisbarang.jenis_id`
   );
@@ -13,7 +13,7 @@ const getAllBarang = async () => {
 const getAllBarangById = async (id) => {
   const result = await db.query(
     `SELECT BARANG.barang_id, BARANG.kode_barang, BARANG.nama_barang, 
-      jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, 
+      jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, BARANG.satuan_berat,
       BARANG.berat, BARANG.satuan_volume, BARANG.volume 
       FROM BARANG JOIN jenisbarang ON BARANG.jenis_id = jenisbarang.jenis_id
       WHERE BARANG.barang_id = $1`,
