@@ -43,7 +43,32 @@ const addJenisBarang = async (req, res, next) => {
   }
 };
 
+const updateJenisBarang = async (req, res, next) => {
+  try {
+    let deskripsi = req.body.deskripsi;
+    const idJenis = req.params.id;
+
+    let jenisBarang = await jenisBarangModel.getJenisBarangById(idJenis);
+    if (jenisBarang.length === 0) {
+      return res.status(403).json({
+        success: false,
+        message: "Tidak ada jenis barang ini",
+      });
+    }
+
+    let updatedjenisBarang = await jenisBarangModel.updateJenisBarangById(idJenis, deskripsi);
+    return res.status(200).json({
+      success: true,
+      updatedjenisBarang,
+    });
+  } catch (exception) {
+    error(exception);
+    next(exception);
+  }
+};
+
 module.exports = {
   getAllJenisBarang,
   addJenisBarang,
+  updateJenisBarang,
 };

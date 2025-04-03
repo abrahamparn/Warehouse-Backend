@@ -28,10 +28,10 @@ const validateLogin = [
 const validateGetBarangById = [
   param("id")
     .notEmpty()
-    .withMessage("Todo ID is required")
+    .withMessage("Barang ID is required")
     .bail()
     .isInt({ gt: 0 })
-    .withMessage("Todo ID must be a positive integer"),
+    .withMessage("Barang ID must be a positive integer"),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -62,6 +62,9 @@ const validateAddBarang = [
     .if(body("volumeBarang").notEmpty())
     .isNumeric()
     .withMessage("Volume barang hanya bisa diisi menggunakan angka"),
+  body("satuanBeratBarang").notEmpty().isNumeric().withMessage("Satuan Berat Barang harus diisi"),
+  body("satuanVolumeBarang").notEmpty().isNumeric().withMessage("satuan volume barang harus diisi"),
+
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -85,10 +88,88 @@ const validateAddJenisBarang = [
   },
 ];
 
+const validateUpdateJenisBarang = [
+  param("id")
+    .notEmpty()
+    .withMessage("Jenis Barang ID is required")
+    .bail()
+    .isInt({ gt: 0 })
+    .withMessage("Jenis Barang ID must be a positive integer"),
+  body("deskripsi").trim().notEmpty().withMessage("Deskripsi harus diisi"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
+const validateUpdateVolumeBarang = [
+  param("id")
+    .notEmpty()
+    .withMessage("Volume Barang ID is required")
+    .bail()
+    .isInt({ gt: 0 })
+    .withMessage("Volume Barang ID must be a positive integer"),
+  body("deskripsi").trim().notEmpty().withMessage("Deskripsi harus diisi"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
+const validateAddVolumeBarang = [
+  body("deskripsi").notEmpty().trim().withMessage("Deksripsi harus diisi"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
+const validateUpdateBeratBarang = [
+  param("id")
+    .notEmpty()
+    .withMessage("Berat Barang ID is required")
+    .bail()
+    .isInt({ gt: 0 })
+    .withMessage("Berat Barang ID must be a positive integer"),
+  body("deskripsi").trim().notEmpty().withMessage("Deskripsi harus diisi"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
+const validateAddBeratBarang = [
+  body("deskripsi").notEmpty().trim().withMessage("Deksripsi harus diisi"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
   validateGetBarangById,
   validateAddBarang,
   validateAddJenisBarang,
+  validateUpdateJenisBarang,
+  validateUpdateVolumeBarang,
+  validateAddVolumeBarang,
+  validateAddBeratBarang,
+  validateUpdateBeratBarang,
 };

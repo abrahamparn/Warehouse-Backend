@@ -13,6 +13,8 @@ const testRouter = require("./modules/test/test.router"); // If implemented
 const authRouter = require("./modules/authentication/authentication.router");
 const dataBarangRouter = require("./modules/dataBarang/dataBarang.router");
 const jenisBarangRouter = require("./modules/jenisBarang/jenisBarang.router");
+const volumeBarangRouter = require("./modules/volumeBarang/volumeBarang.router");
+const beratBarangRouter = require("./modules/beratBarang/beratBarang.router");
 
 const app = express();
 
@@ -39,6 +41,8 @@ if (process.env.NODE_ENV === "test") {
 // autorized endpoints
 app.use("/api/dataBarang", authorize, dataBarangRouter);
 app.use("/api/jenisBarang", authorize, jenisBarangRouter);
+app.use("/api/volumeBarang", authorize, volumeBarangRouter);
+app.use("/api/beratBarang", authorize, beratBarangRouter);
 
 // Handle Unknown Endpoints
 app.use(unknownEndpoint);

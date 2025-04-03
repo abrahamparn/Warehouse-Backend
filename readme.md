@@ -141,7 +141,6 @@ CREATE TABLE IF NOT EXISTS WAREHOUSE (
     lokasi_warehouse VARCHAR(255)
 );
 
-
 -- =======================
 -- 2. Tabel JenisBarang
 --    (master jenis/kategori barang)
@@ -151,6 +150,17 @@ CREATE TABLE IF NOT EXISTS JenisBarang (
     deskripsi  VARCHAR(255)  NOT NULL
 );
 
+
+CREATE TABLE IF NOT EXISTS volumeBarang(
+    volume_barang_id SERIAL PRIMARY KEY,
+    deskripsi  VARCHAR(255)  NOT NULL
+)
+
+
+CREATE TABLE IF NOT EXISTS beratBarang(
+    berat_barang_id SERIAL PRIMARY KEY,
+    deskripsi  VARCHAR(255)  NOT NULL
+)
 
 CREATE TABLE IF NOT EXISTS BARANG (
     barang_id       SERIAL         PRIMARY KEY,
@@ -164,9 +174,16 @@ CREATE TABLE IF NOT EXISTS BARANG (
     harga_terkini   numeric(12,2),
 
     -- Misalnya kita ingin simpan satuan berat/volume dalam bentuk teks
-    satuan_berat    VARCHAR(50),
+    berat_barang_id INT           NOT NULL,
+    CONSTRAINT fk_berat_barang_id
+        FOREIGN KEY (berat_barang_id) REFERENCES beratBarang(berat_barang_id),
+
     berat           numeric(12,4)  DEFAULT 0,   -- Contoh: dalam kg (jika padat)
-    satuan_volume   VARCHAR(50),
+
+    volume_barang_id INT           NOT NULL,
+
+    CONSTRAINT fk_volume_barang_id
+        FOREIGN KEY (volume_barang_id) REFERENCES volumeBarang(volume_barang_id),
     volume          numeric(12,4)  DEFAULT 0,   -- Contoh: dalam liter / m3
 
     created_at      TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
@@ -253,6 +270,15 @@ VALUES
     ('Kebutuhan Rumah Tangga'),
     ('Produk Kebersihan');
 
+-- Insert values into volumeBarang
+INSERT INTO volumeBarang (deskripsi) VALUES
+('ml'),
+('L');
+
+-- Insert values into beratBarang
+INSERT INTO beratBarang (deskripsi) VALUES
+('gr'),
+('kg');
 
 INSERT INTO BARANG
 (kode_barang, nama_barang, jenis_id, harga_terkini, satuan_berat, berat, satuan_volume, volume)

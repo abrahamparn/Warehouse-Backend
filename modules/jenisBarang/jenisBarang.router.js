@@ -1,6 +1,9 @@
 const express = require("express");
 const jenisBarangController = require("./jenisBarang.controller");
-const { validateAddJenisBarang } = require("../../middleware/validation");
+const {
+  validateAddJenisBarang,
+  validateUpdateJenisBarang,
+} = require("../../middleware/validation");
 const { checkRole } = require("../../middleware/checkRole");
 
 const router = express.Router();
@@ -8,6 +11,12 @@ const router = express.Router();
 // get
 router.get("/", jenisBarangController.getAllJenisBarang);
 // update
+router.put(
+  "/:id",
+  checkRole("admin"),
+  validateUpdateJenisBarang,
+  jenisBarangController.updateJenisBarang
+);
 // post
 router.post("/", validateAddJenisBarang, jenisBarangController.addJenisBarang);
 // delete

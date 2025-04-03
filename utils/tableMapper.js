@@ -3,9 +3,9 @@ const tableBarangMapper = {
   namaBarang: "nama_barang",
   jenisBarang: "jenis_id",
   hargaBarang: "harga_terkini",
-  satuanBeratBarang: "satuan_berat",
+  satuanBeratBarang: "berat_barang_id",
   beratBarang: "berat",
-  satuanVolumeBarang: "satuan_volume",
+  satuanVolumeBarang: "volume_barang_id",
   volumeBarang: "volume",
 };
 
@@ -14,9 +14,9 @@ const updateTableBarangMapper = {
   namaBarang: "nama_barang",
   jenisBarang: "jenis_id",
   hargaBarang: "harga_terkini",
-  satuanBeratBarang: "satuan_berat",
+  satuanBeratBarang: "berat_barang_id",
   beratBarang: "berat",
-  satuanVolumeBarang: "satuan_volume",
+  satuanVolumeBarang: "volume_barang_id",
   volumeBarang: "volume",
 };
 

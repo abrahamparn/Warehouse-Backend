@@ -3,9 +3,11 @@ const db = require("../../utils/db");
 const getAllBarang = async () => {
   const result = await db.query(
     `SELECT BARANG.barang_id, BARANG.kode_barang, BARANG.nama_barang, 
-    jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, BARANG.satuan_berat,
-    BARANG.berat, BARANG.satuan_volume, BARANG.volume 
-    FROM BARANG JOIN jenisbarang ON BARANG.jenis_id = jenisbarang.jenis_id`
+    jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, beratBarang.deskripsi as berat_barang,
+    BARANG.berat, volumeBarang.deskripsi as volume_barang, BARANG.volume 
+    FROM BARANG JOIN jenisbarang ON BARANG.jenis_id = jenisbarang.jenis_id
+    JOIN beratBarang ON BARANG.berat_barang_id = beratBarang.berat_barang_id
+    JOIN volumeBarang ON BARANG.volume_barang_id = volumeBarang.volume_barang_id`
   );
   return result["rows"];
 };
@@ -13,9 +15,11 @@ const getAllBarang = async () => {
 const getAllBarangById = async (id) => {
   const result = await db.query(
     `SELECT BARANG.barang_id, BARANG.kode_barang, BARANG.nama_barang, 
-      jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini, BARANG.satuan_berat,
-      BARANG.berat, BARANG.satuan_volume, BARANG.volume 
+      jenisbarang.deskripsi as jenis_barang, BARANG.harga_terkini,  beratBarang.deskripsi as berat_barang,
+      BARANG.berat, volumeBarang.deskripsi as volume_barang, BARANG.volume 
       FROM BARANG JOIN jenisbarang ON BARANG.jenis_id = jenisbarang.jenis_id
+      JOIN beratBarang ON BARANG.berat_barang_id = beratBarang.berat_barang_id
+      JOIN volumeBarang ON BARANG.volume_barang_id = volumeBarang.volume_barang_id
       WHERE BARANG.barang_id = $1`,
     [id]
   );
@@ -36,6 +40,7 @@ const updateBarangById = async (id, fields) => {
   const setClause = keys.map((key, index) => `${key} = $${index + 1}`).join(", ");
   const values = Object.values(fields);
   values.push(id);
+  console.log(`UPDATE BARANG SET ${setClause} WHERE barang_id = $${values.length} RETURNING *`);
 
   const result = await db.query(
     `UPDATE BARANG SET ${setClause} WHERE barang_id = $${values.length} RETURNING *`,
